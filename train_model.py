@@ -94,7 +94,7 @@ for col in cat_features:
             # use test, col and slicevalue as part of the input
             data=test,
             column_name=col,
-            slice_value=slice_value,
+            slice_value=slicevalue,
             categorical_features=cat_features,
             label='salary',
             encoder=encoder,
