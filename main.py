@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 from ml.data import apply_label, process_data
 from ml.model import inference, load_model
+from ml.model import train_and_save_final_model
 
 # DO NOT MODIFY
 class Data(BaseModel):
@@ -72,3 +73,6 @@ async def post_inference(data: Data):
     )
     _inference = None # your code here to predict the result using data_processed
     return {"result": apply_label(_inference)}
+
+
+

@@ -2,6 +2,7 @@ import pickle
 from sklearn.metrics import fbeta_score, precision_score, recall_score
 from ml.data import process_data
 # TODO: add necessary import
+import os
 from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 import pandas as pd
@@ -88,6 +89,8 @@ def save_model(model, path):
 def load_model(path):
     """ Loads pickle file from `path` and returns it."""
     # TODO: implement the function
+    with open(path,"rb") as f:
+        return pickle.load(f)
     pass
 
 
@@ -145,3 +148,22 @@ def performance_on_categorical_slice(
     preds = inference(model, X_slice)
     precision, recall, fbeta = compute_model_metrics(y_slice, preds)
     return precision, recall, fbeta
+
+#added for k-fold model
+def train_and_save_final_model(data, categorical_features, label, model_dir):
+    X_all, y_all, encoder, lb = process_data(
+        data,
+        categorical_features=categorical_features,
+        label=label,
+        training=True,
+    )
+    
+    model = train_model(X_all, y_all)
+    
+    os.makedirs(model_dir, exist_ok=True)
+    save_model(model, os.path.join(model_dir, "model.pkl"))
+    save_model(encoder, os.path.join(model_dir, "encoder.pkl"))
+    save_model(lb, os.path.join(model_dir, "lb.pkl"))
+
+    return model, encoder, lb
+    
