@@ -3,6 +3,7 @@ import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
+import numpy as np
 
 from ml.data import process_data
 from ml.model import (
@@ -24,10 +25,8 @@ data = pd.read_csv(data_path)
 # Optional enhancement, use K-fold cross validation instead of a train-test split.
 #X_train, X_test, y_train, y_test = train_test_split
 #train, test = None, None# Your code here
-train, test = train_test_split(data, test_size=.20, random_state=42)
-
-
-
+#train, test = train_test_split(data, test_size=.20, random_state=42)
+###K-fold
 # DO NOT MODIFY
 cat_features = [
     "workclass",
@@ -40,48 +39,71 @@ cat_features = [
     "native-country",
 ]
 
-# TODO: use the process_data function provided to process the data.
-X_train, y_train, encoder, lb = process_data(
-    # your code here
-    # use the train dataset 
-    # use training=True
-    # do not need to pass encoder and lb as input
-    train,
-    categorical_features=cat_features,
-    label="salary",
-    training=True
+
+k=5
+kf = KFold(n_splits=k, shuffle=True, random_state=42)
+#some scores-precision_score, recall_scores, f1_scores
+precision_score=[]
+recall_scores=[]
+f1_scores=[]
+
+#train and eval
+for fold, (train_idx, test_idx) in enumerate(kf.split(data)):
+    train= data.iloc[train_idx]
+    test= data.iloc[test_idx]
+    
+    X_train, y_train, encoder, lb = process_data(
+        train,
+        categorical_features=cat_features,
+        label="salary",
+        training=True
+    )
+    
+    X_test, y_test, _, _ = process_data(
+        train,
+        categorical_features=cat_features,
+        label="salary",
+        training=False,
+        encoder=encoder,
+        lb=lb
     )
 
-X_test, y_test, _, _ = process_data(
-    test,
-    categorical_features=cat_features,
-    label="salary",
-    training=False,
-    encoder=encoder,
-    lb=lb,
-)
+
 
 # TODO: use the train_model function to train the model on the training dataset
 #model = None # your code here
 model = train_model(X_train, y_train)
 
 # save the model and the encoder
-model_path = os.path.join(project_path, "model", "model.pkl")
-save_model(model, model_path)
-encoder_path = os.path.join(project_path, "model", "encoder.pkl")
-save_model(encoder, encoder_path)
+#model_path = os.path.join(project_path, "model", "model.pkl")
+#save_model(model, model_path)
+#encoder_path = os.path.join(project_path, "model", "encoder.pkl")
+#save_model(encoder, encoder_path)
 
 # load the model
-model = load_model(
-    model_path
-) 
+#model = load_model(
+    #model_path
+#) 
 
 # TODO: use the inference function to run the model inferences on the test dataset.
 #preds = None # your code here
 preds = inference(model, X_test)
+
+
 # Calculate and print the metrics
 p, r, fb = compute_model_metrics(y_test, preds)
+precision_score.append(p)
+recall_scores.append(r)
+f1_scores.append(r)
+f1_scores.append(fb)
 print(f"Precision: {p:.4f} | Recall: {r:.4f} | F1: {fb:.4f}")
+
+#metrics for folds
+print("\n=== Average Metrics Across Folds ===")
+print("avg precision: {np.mean(precision_scores): .4f}")
+print("avg recall: {np.mean(recall): .4f}")
+print("avg f1_score: {np.mean(f1_score): .4f}")
+
 
 # TODO: compute the performance on model slices using the performance_on_categorical_slice function
 # iterate through the categorical features
