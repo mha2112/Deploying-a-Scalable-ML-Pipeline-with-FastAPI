@@ -4,7 +4,6 @@ import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
-from ml.data import process_data
 from ml.model import save_model
 from ml.data import apply_label, process_data
 from ml.model import inference, load_model
@@ -30,12 +29,12 @@ class Data(BaseModel):
     native_country: str = Field(..., example="United-States", alias="native-country")
 
 #path = None # TODO: enter the path for the saved encoder
-path = os.path.join("ml", "data")
-encoder = load_model(path)
+encoder_path = "model/encoder.pkl"
+encoder = load_model(encoder_path)
 
 #path = None # TODO: enter the path for the saved model
-path = os.path.join("ml", "model")
-model = load_model(path)
+model_path = "model/model.pkl"
+model = load_model(model_path)
 
 # TODO: create a RESTful API using FastAPI
 #app = None # your code here
@@ -52,7 +51,7 @@ async def get_root():
 
 
 # TODO: create a POST on a different path that does model inference
-@app.post("/data/")
+@app.post("/predict/")
 async def post_inference(data: Data):
     # DO NOT MODIFY: turn the Pydantic model into a dict.
     data_dict = data.dict()
@@ -74,7 +73,7 @@ async def post_inference(data: Data):
     ]
     data_processed, _, _, _ = process_data(
         # your code here
-        data=data,
+        X=data,
         categorical_features=cat_features,
         label=None,
         training=False,
@@ -84,7 +83,7 @@ async def post_inference(data: Data):
         # do not need to pass lb as input
     )
     #_inference = None # your code here to predict the result using data_processed
-    _inference = 
+    _inference = inference(model, data_processed)
     return {"result": apply_label(_inference)}
 
 

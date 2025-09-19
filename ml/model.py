@@ -89,6 +89,7 @@ def save_model(model, path):
 def load_model(path):
     """ Loads pickle file from `path` and returns it."""
     # TODO: implement the function
+    print(f'loading model path {path}')
     with open(path,"rb") as f:
         return pickle.load(f)
     pass
@@ -161,9 +162,19 @@ def train_and_save_final_model(data, categorical_features, label, model_dir):
     model = train_model(X_all, y_all)
     
     os.makedirs(model_dir, exist_ok=True)
-    save_model(model, os.path.join(model_dir, "model.pkl"))
-    save_model(encoder, os.path.join(model_dir, "encoder.pkl"))
-    save_model(lb, os.path.join(model_dir, "lb.pkl"))
+    model_path = os.path.join(model_dir, "model.pk1")
+    encoder_path= os.join(model_dir, "encoder.pkl")
+    lb_path= os.join(model_dir, "lb.pkl")
+    
+    save_model(model, model_path)
+    save_model(encoder, encoder_path)
+    save_model(lb,lb_path)
+    
+    #didn't see model_saved after running the code
+    print(f'Model saved to {model_path}')
+    print(f'Model saved to {encoder_path}')
+    print(f'Model saved to {lb_path}')
+    
 
     return model, encoder, lb
     
