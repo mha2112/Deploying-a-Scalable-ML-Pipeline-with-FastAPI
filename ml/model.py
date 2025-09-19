@@ -163,8 +163,8 @@ def train_and_save_final_model(data, categorical_features, label, model_dir):
     
     os.makedirs(model_dir, exist_ok=True)
     model_path = os.path.join(model_dir, "model.pk1")
-    encoder_path= os.join(model_dir, "encoder.pkl")
-    lb_path= os.join(model_dir, "lb.pkl")
+    encoder_path= os.path.join(model_dir, "encoder.pkl")
+    lb_path= os.path.join(model_dir, "lb.pkl")
     
     save_model(model, model_path)
     save_model(encoder, encoder_path)
